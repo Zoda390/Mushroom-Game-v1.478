@@ -155,16 +155,16 @@ var move_fly_down_button = 69; //e
 
 function takeInput(){
     if (keyIsDown(move_right_button)){
-        cam.x -= 0.25;
+        cam.x -= 0.25 * (deltaTheta>PI*(2/3) && deltaTheta<PI*(4/3)? -1:1);
     }
     if (keyIsDown(move_left_button)){
-        cam.x += 0.25;
+        cam.x += 0.25 * (deltaTheta>PI*(2/3) && deltaTheta<PI*(4/3)? -1:1);
     }
     if (keyIsDown(move_up_button)){
-        cam.y += 0.25;
+        cam.y += 0.25 * (deltaTheta>PI*(2/3) && deltaTheta<PI*(4/3)? -1:1);
     }
     if (keyIsDown(move_down_button)){
-        cam.y -= 0.25;
+        cam.y -= 0.25 * (deltaTheta>PI*(2/3) && deltaTheta<PI*(4/3)? -1:1);
     }
     if (keyIsDown(move_fly_up_button)){
         cam.z -= 0.25;
