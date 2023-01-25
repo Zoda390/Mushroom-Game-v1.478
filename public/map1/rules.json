@@ -1,0 +1,11 @@
+{
+"solid":[{"name":"stone","hp":10,"texArray":["stone_all.png","stone_all.png","stone_all.png","stone_all.png","stone_all.png","stone_all.png"]},
+         {"name":"dirt","hp":10,"texArray":["dirt_all.png","dirt_all.png","dirt_all.png","dirt_all.png","dirt_all.png","dirt_all.png"]},
+         {"name":"grass","hp":10,"texArray":["grass_sides.png","grass_sides.png","grass_sides.png","grass_sides.png","grass_top.png","dirt_all.png"]}],
+"liquid":[{"name":"water","hp":10,"texArray":[0,0,0,0,0,0]},
+          {"name":"lava","hp":10,"texArray":[0,0,0,0,0,0]}],
+"entity":[{"name":"player","hp":10,"texArray":[0,0,0,0,0,0]},
+          {"name":"minion","hp":10,"texArray":[0,0,0,0,0,0]}],
+"facing":[{"name":"log","hp":10,"texArray":[0,0,0,0,0,0]},
+          {"name":"stair","hp":10,"texArray":[0,0,0,0,0,0]}]
+}
