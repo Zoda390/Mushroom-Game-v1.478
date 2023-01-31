@@ -2,6 +2,9 @@
 import {Server} from "socket.io"
 import express from "express"
 import fs from "fs"
+import {ServerItem} from "./server-classes/item_classes.js"
+import {ServerTile, ServerTileEntity} from "./server-classes/tile_classes.js"
+import {ServerChunk, ServerMap} from "./server-classes/map_classes.js"
 
 const port = 3000;
 const app = express();
@@ -11,12 +14,16 @@ app.use(express.static("public"));
 console.log("My server is running on port " + port);
 
 
+var cur_file;
+
 //open a json file and make map for names and types
 var rules_obj = fs.readFileSync("public/map1/rules.json");
 rules_obj = JSON.parse(rules_obj);
 
-
-var cur_file;
+var csmap = new ServerMap("test", 123, 1.478);
+csmap.open('./public/map1');
+csmap.chunk_map[0].tile_map[0][0][0] = new ServerTile(1, 1, 10, 0, 0, 0);
+csmap.save('./public/map1');
 
 io.sockets.on("connection", (socket) =>{
     console.log('New connection: ' + socket.id);
