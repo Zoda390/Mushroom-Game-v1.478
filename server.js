@@ -20,10 +20,10 @@ var cur_file;
 var rules_obj = fs.readFileSync("public/map1/rules.json");
 rules_obj = JSON.parse(rules_obj);
 
-var csmap = new ServerMap("test", 123, 1.478);
-csmap.open('./public/map1');
-csmap.chunk_map[0].tile_map[0][0][0] = new ServerTile(1, 1, 10, 0, 0, 0);
-csmap.save('./public/map1');
+var cs_map = new ServerMap("test", 123, 1.478);
+cs_map.open('./public/map1');
+//cs_map.chunk_map[0].tile_map[0][0][0] = new ServerTile(1, 1, 10, 0, 0, 0);
+//cs_map.save('./public/map1');
 
 io.sockets.on("connection", (socket) =>{
     console.log('New connection: ' + socket.id);
@@ -114,4 +114,19 @@ io.sockets.on("connection", (socket) =>{
             console.error(err);
         }
     });
+
+    socket.on('join', (data) => {
+        //convert the map to a string and send it to the player
+        socket.emit('give_world', {name: cs_map.name, seed: cs_map.seed, ver: cs_map.ver, chunks: cs_map.totxt()});
+
+        //add a player to the map
+        /*
+        cs_map.tile_map[data.y][data.x][data.z] = new ServerTileEntity(find_in_array("entity", tile_type_map), find_in_array("player", tile_name_map), 100, (player_count%2), 0);
+        cs_map.tile_map[data.y][data.x][data.z].id = data.id;
+        cs_map.tile_map[data.y][data.x][data.z].inv[0] = new ServerItem(2, 5, 1, '');
+        cs_map.tile_map[data.y][data.x][data.z].inv[1] = new ServerItem(1, 4, 10, '');
+        socket.emit('change', {x: data.x, y: data.y, z: data.z, to: cs_map.tile_map[data.y][data.x][data.z].toStr()});
+        player_count++;
+        */
+    })
 });

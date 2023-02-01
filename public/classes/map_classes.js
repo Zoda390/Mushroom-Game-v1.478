@@ -274,6 +274,16 @@ class ClientChunk{
                 }
             }
         }
+        
+        for(let y = 0; y < this.tile_map.length; y++){
+            for(let x = 0; x < this.tile_map[0].length; x++){
+                for(let z = 0; z < this.tile_map[0][0].length; z++){
+                    if(this.tile_map[y][x][z] !== 0){
+                        this.tile_map[y][x][z].assign_neighbors(this.tile_map);
+                    }
+                }
+            }
+        }
         this.m = this.make_model(true);
     }
 }

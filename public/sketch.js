@@ -5,7 +5,7 @@ var slider;
 var tile_imgs = [];
 var deltaTheta = 0;
 var deltaPhi = 0;
-var ccmap; //current client map
+var cc_map; //current client map
 var atlas;
 var cam = {x: 0, y: 0, z: -2};
 var socket;
@@ -55,7 +55,7 @@ function preload(){
             let temp = data[i].split('~');
             socket.emit("open_chunk", {x: parseInt(temp[0]), y: parseInt(temp[1])});
         }
-        ccmap.chunk_map = [];
+        cc_map.chunk_map = [];
         loading_map = [];
     });
 
@@ -63,7 +63,30 @@ function preload(){
     socket.on('open_chunk', (data) => {
         let temp = new ClientChunk(data.x, data.y, false);
         temp.fromStr(data.file);
-        ccmap.chunk_map.push(temp);
+        cc_map.chunk_map.push(temp);
+    });
+
+    //when the server gives you the world data
+    socket.on('give_world', data => {
+        if(cc_map == undefined){ //only take the world if you don't already have it
+            cc_map = new ClientMap("unUpdated", 0, 0);
+            cc_map.name = data.name;
+            cc_map.seed = data.seed;
+            cc_map.ver = data.ver;
+            cc_map.chunk_map = [];
+            loading_map = [];
+            for(let i = 0; i < data.chunks.length; i++){
+                let temp = new ClientChunk(data.chunks[i].x, data.chunks[i].y, false);
+                temp.fromStr(data.chunks[i].txt);
+                cc_map.chunk_map.push(temp);
+            }
+            
+        }
+        /*
+        else{
+            console.log(cc_map);
+        }
+        */
     });
 
     tile_imgs.push(loadImage("map1/textures/stone_all.png"));
@@ -97,9 +120,7 @@ function setup() {
     slider = createSlider(1, width, width, 1);
     slider.position(1, height+40);
     slider.style('width', width+"px");
-    ccmap = new ClientMap("Map1", 1, 0.5);
-    //ccmap.save("public/map1");
-    ccmap.open("public/map1");
+    socket.emit("join");
 }
 
 function draw() {
@@ -121,7 +142,7 @@ function draw() {
     oc();
     takeInput();
     if(loading_map.length == 9){
-        ccmap.render();
+        cc_map.render();
     }
     layer0.pop();
     layer1.rect(0, 0, width, height);

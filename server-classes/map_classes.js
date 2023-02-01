@@ -185,6 +185,16 @@ export class ServerChunk{
                 }
             }
         }
+
+        for(let y = 0; y < this.tile_map.length; y++){
+            for(let x = 0; x < this.tile_map[0].length; x++){
+                for(let z = 0; z < this.tile_map[0][0].length; z++){
+                    if(this.tile_map[y][x][z] !== 0){
+                        this.tile_map[y][x][z].assign_neighbors(this.tile_map);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -271,5 +281,13 @@ export class ServerMap{
                 console.error(err);
             }
         }
+    }
+
+    totxt(){
+        var chunks=[];
+        for(let i = 0; i < this.chunk_map.length; i++){
+            chunks.push({x: this.chunk_map[i].pos.x, y: this.chunk_map[i].pos.y, txt: this.chunk_map[i].totxt()});
+        }
+        return chunks;
     }
 }
