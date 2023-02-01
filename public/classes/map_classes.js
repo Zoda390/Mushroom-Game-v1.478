@@ -318,7 +318,6 @@ class ClientMap{
     }
 
     render(){
-        layer0.translate(64*cam.x, 64*cam.z, 64*cam.y);
         for(let i = 0; i < this.chunk_map.length; i++){
             this.chunk_map[i].render();
         }

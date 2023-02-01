@@ -7,7 +7,7 @@ var deltaTheta = 0;
 var deltaPhi = 0;
 var cc_map; //current client map
 var atlas;
-var cam = {x: 0, y: 0, z: -2};
+var cam;
 var socket;
 var loading_map = [];
 var chunk_load_wait = 0;
@@ -93,6 +93,7 @@ function preload(){
     tile_imgs.push(loadImage("map1/textures/dirt_all.png"));
     tile_imgs.push(loadImage("map1/textures/grass_top.png"));
     tile_imgs.push(loadImage("map1/textures/grass_sides.png"));
+    tile_imgs.push(loadImage("map1/textures/player.png"));
 }
 
 function setup() {
@@ -121,6 +122,9 @@ function setup() {
     slider.position(1, height+40);
     slider.style('width', width+"px");
     socket.emit("join");
+
+    cam = layer0.createCamera();
+    e1 = new ClientTileEntity("player", 50, 0, 0, 4);
 }
 
 function draw() {
@@ -137,12 +141,14 @@ function draw() {
     layer0.clear();
     layer0.background(100);
     layer0.push();
+    layer0.setCamera(cam);
     //layer0.rotateX(frameCount * 0.01);
     //layer0.rotateY(frameCount * 0.01);
     oc();
     takeInput();
     if(loading_map.length == 9){
         cc_map.render();
+        e1.render();
     }
     layer0.pop();
     layer1.rect(0, 0, width, height);
@@ -176,33 +182,26 @@ var move_fly_down_button = 69; //e
 
 function takeInput(){
     if (keyIsDown(move_right_button)){
-        cam.x -= 0.25 * Math.cos(deltaTheta); //(deltaTheta>PI*(2/3) && deltaTheta<PI*(4/3)? -1:1)
-        cam.y += 0.25 * Math.sin(deltaTheta);
+        cam.move(0.25*64*Math.cos(deltaTheta), 0, -0.25*64*Math.sin(deltaTheta));
     }
     if (keyIsDown(move_left_button)){
-        cam.x += 0.25 * Math.cos(deltaTheta);
-        cam.y -= 0.25 * Math.sin(deltaTheta);
+        cam.move(-0.25*64*Math.cos(deltaTheta), 0, 0.25*64*Math.sin(deltaTheta));
     }
     if (keyIsDown(move_up_button)){
-        cam.y += 0.25 * Math.cos(deltaTheta);
-        cam.x += 0.25 * Math.sin(deltaTheta);
+        cam.move(-0.25*64*Math.sin(deltaTheta), 0, -0.25*64*Math.cos(deltaTheta));
     }
     if (keyIsDown(move_down_button)){
-        cam.y -= 0.25 * Math.cos(deltaTheta);
-        cam.x -= 0.25 * Math.sin(deltaTheta);
+        cam.move(0.25*64*Math.sin(deltaTheta), 0, 0.25*64*Math.cos(deltaTheta));
     }
     if (keyIsDown(move_fly_up_button)){
-        cam.z -= 0.25;
+        cam.move(0, 0.25*64, 0);
     }
     if (keyIsDown(move_fly_down_button)){
-        cam.z += 0.25;
+        cam.move(0, -0.25*64, 0);
     }
 }
 
 function oc(sensitivityX, sensitivityY, sensitivityZ){
-    deltaPhi = min(deltaPhi, PI/2);
-    deltaPhi = max(deltaPhi, -PI/2);
-    layer0._renderer._curCamera._orbit(deltaTheta, deltaPhi, 0);
 
     const mouseInCanvas = mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0;
     if (!mouseInCanvas) return;
@@ -220,9 +219,10 @@ function oc(sensitivityX, sensitivityY, sensitivityZ){
     const scaleFactor = height < width ? height : width;
 
     if (mouseIsPressed && mouseButton === LEFT && mouseInCanvas) {
-        deltaTheta += -sensitivityX * (mouseX - pmouseX) / scaleFactor;
-        deltaPhi += sensitivityY * (mouseY - pmouseY) / scaleFactor;
+        deltaTheta = -sensitivityX * (mouseX - pmouseX) / scaleFactor;
+        deltaPhi = sensitivityY * (mouseY - pmouseY) / scaleFactor;
     }
+    cam._orbit(deltaTheta, deltaPhi, 0);
 
     return;
 }

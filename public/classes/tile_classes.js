@@ -7,8 +7,8 @@ function find_in_array(input, arr){
 }
 
 var tile_type_map = [0, 'solid', 'liquid', 'entity', 'facing'];
-var tile_name_map = [0, 'stone', 'dirt', 'grass', 'water', 'player', 'wood', 'minion', 'crystal base', 'minion log'];
-var tile_img_map = [0, [0,0,0,0,0,0],[1,1,1,1,1,1],[3,3,3,3,2,1]];
+var tile_name_map = [0, 'stone', 'dirt', 'grass', 'player', 'water', 'wood', 'minion', 'crystal base', 'minion log'];
+var tile_img_map = [0, [0,0,0,0,0,0],[1,1,1,1,1,1],[3,3,3,3,2,1], [4,4]];
 var tile_size = 64; //tile_size should be an int
 
 class ClientTile{ //a solid tile
@@ -58,5 +58,57 @@ class ClientTile{ //a solid tile
 
     toStr(){
         return find_in_array(this.type, tile_type_map) + '.' + find_in_array(this.name, tile_name_map) + '.' + this.hp;
+    }
+}
+
+class ClientTileEntity extends ClientTile{
+    constructor(name, hp, x, y, z){
+        super("Entity", name, hp, x, y, z);
+        this.facing = 0;
+        this.offset = {x: 0, y: 0, z: 0};
+        this.m = this.makeModel();
+        this.rm = "2D";
+    }
+
+    render(){
+        layer0.push();
+        layer0.translate((this.pos.x + 0.5)*64, (this.pos.z - 0.5)*64, (this.pos.y + 0.5)*64);
+        layer0.noStroke();
+        layer0.texture(tile_imgs[this.imgs[0]]);
+        if(this.rm == "2D"){
+            //console.log(cam.eyeX + " " + cam.eyeY + " " + cam.eyeZ);
+            let v1 = createVector(cam.eyeX, cam.eyeZ);
+            let v2 = createVector((this.pos.x+0.5)*64, (this.pos.y+0.5)*64);
+            layer0.rotateY(v1.angleBetween(v2)+0.5);
+            if(cam.eyeY-32 < -450-32){
+                layer0.texture(tile_imgs[this.imgs[0]]);
+                layer0.rotateX(PI/2);
+            }
+        }
+        else{
+        
+        }
+        layer0.model(this.m);
+        layer0.pop();
+    }
+
+    makeModel(){
+        return new p5.Geometry(1,1,
+            function(){
+                this.vertices = [];
+                this.vertices.push(new p5.Vector(-0.5*64, -0.5*64, 0*64));
+                this.vertices.push(new p5.Vector(0.5*64, -0.5*64, 0*64));
+                this.vertices.push(new p5.Vector(0.5*64, 0.5*64, 0*64));
+                this.vertices.push(new p5.Vector(-0.5*64, 0.5*64, 0*64));
+                
+                this.uvs.push([0.0, 0.0]);
+                this.uvs.push([1.0, 0.0]);
+                this.uvs.push([1.0, 1.0]);
+                this.uvs.push([0.0, 1.0]);
+            
+                this.faces.push([0,1,2]);
+                this.faces.push([2,3,0]);
+            }
+        )
     }
 }
