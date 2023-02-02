@@ -201,21 +201,11 @@ function takeInput(){
     }
 }
 
-function oc(sensitivityX, sensitivityY, sensitivityZ){
+function oc(sensitivityX = 1, sensitivityY = 1, sensitivityZ = 0.5){
     cam._orbit(deltaTheta, deltaPhi, 0);
 
     const mouseInCanvas = mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0;
     if (!mouseInCanvas) return;
-
-    if (typeof sensitivityX === 'undefined') {
-        sensitivityX = 1;
-    }
-    if (typeof sensitivityY === 'undefined') {
-        sensitivityY = sensitivityX;
-    }
-    if (typeof sensitivityZ === 'undefined') {
-        sensitivityZ = 0.5;
-    }
 
     const scaleFactor = height < width ? height : width;
 
