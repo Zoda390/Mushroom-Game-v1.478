@@ -80,10 +80,15 @@ class ClientTileEntity extends ClientTile{
             let v1 = createVector(cam.eyeX, cam.eyeZ);
             let v2 = createVector(0, 1);
             layer0.rotateY(v1.angleBetween(v2)+0.0);
-            if(cam.eyeY-32 < -450-32){
-                layer0.texture(tile_imgs[this.imgs[1]]);
-                layer0.rotateX(PI/2);
+            if(cam.eyeY-(this.pos.z*64) < -200){
+                
             }
+            layer0.push();
+            layer0.texture(tile_imgs[this.imgs[1]]);
+            layer0.rotateZ(0.2);
+            layer0.rotateX(PI/2);
+            layer0.plane(64);
+            layer0.pop();
         }
         else{
         
