@@ -202,6 +202,7 @@ function takeInput(){
 }
 
 function oc(sensitivityX, sensitivityY, sensitivityZ){
+    cam._orbit(deltaTheta, deltaPhi, 0);
 
     const mouseInCanvas = mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0;
     if (!mouseInCanvas) return;
@@ -218,11 +219,10 @@ function oc(sensitivityX, sensitivityY, sensitivityZ){
 
     const scaleFactor = height < width ? height : width;
 
-    if (mouseIsPressed && mouseButton === LEFT && mouseInCanvas) {
+    if (mouseIsPressed && mouseButton === LEFT) {
         deltaTheta = -sensitivityX * (mouseX - pmouseX) / scaleFactor;
         deltaPhi = sensitivityY * (mouseY - pmouseY) / scaleFactor;
     }
-    cam._orbit(deltaTheta, deltaPhi, 0);
 
     return;
 }
