@@ -8,7 +8,7 @@ function find_in_array(input, arr){
 
 var tile_type_map = [0, 'solid', 'liquid', 'entity', 'facing'];
 var tile_name_map = [0, 'stone', 'dirt', 'grass', 'player', 'water', 'wood', 'minion', 'crystal base', 'minion log'];
-var tile_img_map = [0, [0,0,0,0,0,0],[1,1,1,1,1,1],[3,3,3,3,2,1], [4,4]];
+var tile_img_map = [0, [0,0,0,0,0,0],[1,1,1,1,1,1],[3,3,3,3,2,1], [4,5]];
 var tile_size = 64; //tile_size should be an int
 
 class ClientTile{ //a solid tile
@@ -72,16 +72,16 @@ class ClientTileEntity extends ClientTile{
 
     render(){
         layer0.push();
-        layer0.translate((this.pos.x + 0.5)*64, (this.pos.z - 0.5)*64, (this.pos.y + 0.5)*64);
+        layer0.translate((this.pos.x + this.offset.x + 0.5)*64, (this.pos.z + this.offset.z - 0.5)*64, (this.pos.y + this.offset.y + 0.5)*64);
         layer0.noStroke();
         layer0.texture(tile_imgs[this.imgs[0]]);
         if(this.rm == "2D"){
             //console.log(cam.eyeX + " " + cam.eyeY + " " + cam.eyeZ);
             let v1 = createVector(cam.eyeX, cam.eyeZ);
-            let v2 = createVector((this.pos.x+0.5)*64, (this.pos.y+0.5)*64);
-            layer0.rotateY(v1.angleBetween(v2)+0.5);
+            let v2 = createVector(0, 1);
+            layer0.rotateY(v1.angleBetween(v2)+0.0);
             if(cam.eyeY-32 < -450-32){
-                layer0.texture(tile_imgs[this.imgs[0]]);
+                layer0.texture(tile_imgs[this.imgs[1]]);
                 layer0.rotateX(PI/2);
             }
         }
@@ -90,6 +90,20 @@ class ClientTileEntity extends ClientTile{
         }
         layer0.model(this.m);
         layer0.pop();
+
+        if(Math.abs(this.offset.x) > 0.01){
+            this.offset.x *= 0.9;
+        }
+        else{
+            this.offset.x = 0;
+        }
+
+        if(Math.abs(this.offset.y) > 0.01){
+            this.offset.y *= 0.9;
+        }
+        else{
+            this.offset.y = 0;
+        }
     }
 
     makeModel(){
@@ -110,5 +124,24 @@ class ClientTileEntity extends ClientTile{
                 this.faces.push([2,3,0]);
             }
         )
+    }
+
+    move(key){
+        if(key == "w"){
+            this.pos.y -= 1;
+            this.offset.y = 1;
+        }
+        if(key == "a"){
+            this.pos.x -= 1;
+            this.offset.x = 1;
+        }
+        if(key == "s"){
+            this.pos.y += 1;
+            this.offset.y = -1;
+        }
+        if(key == "d"){
+            this.pos.x += 1;
+            this.offset.x = -1;
+        }
     }
 }

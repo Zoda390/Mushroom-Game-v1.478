@@ -94,17 +94,24 @@ function preload(){
     tile_imgs.push(loadImage("map1/textures/grass_top.png"));
     tile_imgs.push(loadImage("map1/textures/grass_sides.png"));
     tile_imgs.push(loadImage("map1/textures/player.png"));
+    tile_imgs.push(loadImage("map1/textures/player-top.png"));
 }
 
 function setup() {
     //this is the 2D layer that draws an image from layer1
     createCanvas(800, 700);
 
+    rotate_cam_right_button = RIGHT_ARROW;
+    rotate_cam_left_button = LEFT_ARROW;
+    rotate_cam_up_button = UP_ARROW;
+    rotate_cam_down_button = DOWN_ARROW;
+
     socket.emit("open_shader");
     //the 3D layer used for sampling
     layer0 = createGraphics(width, height, WEBGL);
     layer0.background(100);
     layer0.noStroke();
+
     //the 3D layer used to apply the shader
     layer1 = createGraphics(width, height, WEBGL);
     layer1.background(100);
@@ -179,6 +186,10 @@ var move_up_button = 87; //w
 var move_down_button = 83; //s
 var move_fly_up_button = 81; //q
 var move_fly_down_button = 69; //e
+var rotate_cam_right_button;
+var rotate_cam_left_button;
+var rotate_cam_up_button;
+var rotate_cam_down_button;
 
 function takeInput(){
     if (keyIsDown(move_right_button)){
@@ -199,6 +210,19 @@ function takeInput(){
     if (keyIsDown(move_fly_down_button)){
         cam.move(0, -0.25*64, 0);
     }
+
+    if (keyIsDown(rotate_cam_right_button)){
+        deltaTheta = 0.2;
+    }
+    if (keyIsDown(rotate_cam_left_button)){
+        deltaTheta = -0.2;
+    }
+    if (keyIsDown(rotate_cam_up_button)){
+        deltaPhi = 0.05;
+    }
+    if (keyIsDown(rotate_cam_down_button)){
+        deltaPhi = -0.05;
+    }
 }
 
 function oc(sensitivityX = 1, sensitivityY = 1, sensitivityZ = 0.5){
@@ -212,6 +236,20 @@ function oc(sensitivityX = 1, sensitivityY = 1, sensitivityZ = 0.5){
     if (mouseIsPressed && mouseButton === LEFT) {
         deltaTheta = -sensitivityX * (mouseX - pmouseX) / scaleFactor;
         deltaPhi = sensitivityY * (mouseY - pmouseY) / scaleFactor;
+    }
+    else{
+        if(Math.abs(deltaTheta) > 0.001){
+            deltaTheta *= 0.99;
+        }
+        else{
+            deltaTheta = 0;
+        }
+        if(Math.abs(deltaPhi) > 0.001){
+            deltaPhi *= 0.99;
+        }
+        else{
+            deltaPhi = 0;
+        }
     }
 
     return;
