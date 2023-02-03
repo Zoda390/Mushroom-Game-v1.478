@@ -102,7 +102,6 @@ io.sockets.on("connection", (socket) =>{
     });
 
     //a request to save a chunk from a client to the correct file in the current map folder, no return
-    //!change to be based off of the servers version of the chunk
     socket.on('save_chunk', (data) => { //data should be an obj with 2 ints x and y, denoting the position of the chunk, .file is temporary, it is a string to be saved coming from the client
         if(cur_file === undefined){
             cur_file = data.path;
