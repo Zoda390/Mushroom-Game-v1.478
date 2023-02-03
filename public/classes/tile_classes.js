@@ -66,45 +66,35 @@ class ClientTileEntity extends ClientTile{
         super("Entity", name, hp, x, y, z);
         this.facing = 0;
         this.offset = {x: 0, y: 0, z: 0};
-        this.m = this.makeModel();
+        this.m = tile_models[0];
+        this.m2 = tile_models[1];
         this.rm = "2D";
+        //cam.setPosition((this.pos.x+this.offset.x)*64, (this.pos.z+this.offset.z-5)*64, (this.pos.y+this.offset.y+10)*64);
     }
 
     render(){
         layer0.push();
-        layer0.translate((this.pos.x + this.offset.x + 0.5)*64, (this.pos.z + this.offset.z - 0.5)*64, (this.pos.y + this.offset.y + 0.5)*64);
+        layer0.translate((this.pos.x + this.offset.x + 0.5)*64, (this.pos.z + this.offset.z - 0.55)*64, (this.pos.y + this.offset.y + 0.5)*64);
         layer0.noStroke();
         layer0.texture(tile_imgs[this.imgs[0]]);
-        if(this.rm == "2D"){
-            //console.log(cam.eyeX + " " + cam.eyeY + " " + cam.eyeZ);
-            let v1 = createVector(cam.eyeX, cam.eyeZ);
-            let v2 = createVector(0, 1);
-            layer0.rotateY(v1.angleBetween(v2)+0.0);
-            if(cam.eyeY-(this.pos.z*64) < -200){
-                
-            }
-            layer0.push();
-            layer0.texture(tile_imgs[this.imgs[1]]);
-            layer0.rotateZ(0.2);
-            layer0.rotateX(PI/2);
-            layer0.plane(64);
-            layer0.pop();
-        }
-        else{
-        
-        }
+        layer0.scale(150);
+        let v1 = createVector(cam.eyeX, cam.eyeZ);
+        let v2 = createVector(0, 1);
+        layer0.rotateY(v1.angleBetween(v2)+PI);
         layer0.model(this.m);
         layer0.pop();
 
+        //cam.setPosition((this.pos.x+this.offset.x)*64, (this.pos.z+this.offset.z-5)*64, (this.pos.y+this.offset.y+10)*64);
+        //cam.lookAt((this.pos.x+this.offset.x)*64, (this.pos.z+this.offset.z)*64, (this.pos.y+this.offset.y)*64);
         if(Math.abs(this.offset.x) > 0.01){
-            this.offset.x *= 0.9;
+            this.offset.x *= 0.8;
         }
         else{
             this.offset.x = 0;
         }
 
         if(Math.abs(this.offset.y) > 0.01){
-            this.offset.y *= 0.9;
+            this.offset.y *= 0.8;
         }
         else{
             this.offset.y = 0;

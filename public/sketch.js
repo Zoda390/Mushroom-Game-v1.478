@@ -3,6 +3,7 @@ var layer1;
 var pixelShader;
 var slider;
 var tile_imgs = [];
+var tile_models = [];
 var deltaTheta = 0;
 var deltaPhi = 0;
 var cc_map; //current client map
@@ -95,6 +96,8 @@ function preload(){
     tile_imgs.push(loadImage("map1/textures/grass_sides.png"));
     tile_imgs.push(loadImage("map1/textures/player.png"));
     tile_imgs.push(loadImage("map1/textures/player-top.png"));
+    tile_models.push(loadModel("map1/models/player.obj"));
+    tile_models.push(loadModel("map1/models/player.stl", true));
 }
 
 function setup() {
@@ -194,15 +197,19 @@ var rotate_cam_down_button;
 function takeInput(){
     if (keyIsDown(move_right_button)){
         cam.move(0.25*64*Math.cos(deltaTheta), 0, -0.25*64*Math.sin(deltaTheta));
+        //e1.move("d");
     }
     if (keyIsDown(move_left_button)){
         cam.move(-0.25*64*Math.cos(deltaTheta), 0, 0.25*64*Math.sin(deltaTheta));
+        //e1.move("a");
     }
     if (keyIsDown(move_up_button)){
         cam.move(-0.25*64*Math.sin(deltaTheta), 0, -0.25*64*Math.cos(deltaTheta));
+        //e1.move("w");
     }
     if (keyIsDown(move_down_button)){
         cam.move(0.25*64*Math.sin(deltaTheta), 0, 0.25*64*Math.cos(deltaTheta));
+        //e1.move("s");
     }
     if (keyIsDown(move_fly_up_button)){
         cam.move(0, 0.25*64, 0);
