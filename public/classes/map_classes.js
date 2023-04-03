@@ -9,13 +9,13 @@ class ClientChunk{
                 this.tile_map[y][x][0] = 0;
                 this.tile_map[y][x][1] = 0;
                 this.tile_map[y][x][2] = 0;
-                this.tile_map[y][x][3] = 0;
-                this.tile_map[y][x][4] = new ClientTile("solid", "grass", 10, x, y, 0);
-                this.tile_map[y][x][5] = new ClientTile("solid", "dirt", 10, x, y, 1);
-                this.tile_map[y][x][6] = new ClientTile("solid", "dirt", 10, x, y, 2);
-                this.tile_map[y][x][7] = new ClientTile("solid", "stone", 10, x, y, 3);
-                this.tile_map[y][x][8] = new ClientTile("solid", "stone", 10, x, y, 4);
-                this.tile_map[y][x][9] = new ClientTile("solid", "stone", 10, x, y, 5);
+                this.tile_map[y][x][3] = new ClientTile("solid", "grass", 10, x, y, 0);
+                this.tile_map[y][x][4] = new ClientTile("solid", "grass", 10, x, y, 1);
+                this.tile_map[y][x][5] = new ClientTile("solid", "dirt", 10, x, y, 2);
+                this.tile_map[y][x][6] = new ClientTile("solid", "dirt", 10, x, y, 3);
+                this.tile_map[y][x][7] = new ClientTile("solid", "stone", 10, x, y, 4);
+                this.tile_map[y][x][8] = new ClientTile("solid", "stone", 10, x, y, 5);
+                this.tile_map[y][x][9] = new ClientTile("solid", "stone", 10, x, y, 6);
             }
         }
         
@@ -110,7 +110,7 @@ class ClientChunk{
                 
                 
                 //Cache Stuff
-                this.gid = 'chunk_' + chunk_x + '_' + chunk_y;
+                //this.gid = 'chunk_' + chunk_x + '_' + chunk_y;
             }
         );
     }
@@ -323,3 +323,20 @@ class ClientMap{
         }
     }
 }
+
+/*
+let chunk = 3;
+for(let i = 0; i < cc_map.chunk_map[chunk].tile_map[0][0].length; i++){
+    cc_map.chunk_map[chunk].tile_map[1][1][i] = new ClientTile("solid", "stone", 10, 1, 1, i);
+}
+for(let y = 0; y < cc_map.chunk_map[chunk].tile_map.length; y++){
+    for(let x = 0; x < cc_map.chunk_map[chunk].tile_map[0].length; x++){
+        for(let z = 0; z < cc_map.chunk_map[chunk].tile_map[0][0].length; z++){
+            if(cc_map.chunk_map[chunk].tile_map[y][x][z] !== 0){
+                cc_map.chunk_map[chunk].tile_map[y][x][z].assign_neighbors(cc_map.chunk_map[0].tile_map);
+            }
+        }
+    }
+}
+cc_map.chunk_map[chunk].m = cc_map.chunk_map[chunk].make_model(false);
+*/
