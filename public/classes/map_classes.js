@@ -46,47 +46,57 @@ class ClientChunk{
                 for(let z = 0; z < this.tile_map[0][0].length; z++){
                     if(this.tile_map[y][x][z] !== 0){
                         this.tile_map[y][x][z].assign_neighbors(this.tile_map);
-                        if(this.tile_map[y][x][z].neighbors[0] === 0){
-                            verts.push(new p5.Vector(x*64, z*64, y*64));
-                            verts.push(new p5.Vector(x*64, z*64, (y+1)*64));
-                            verts.push(new p5.Vector(x*64, (z+1)*64, (y+1)*64));
-                            verts.push(new p5.Vector(x*64, (z+1)*64, y*64));
-                            facs.push(this.tile_map[y][x][z].imgs[0]);
+                        if(this.tile_map[y][x][z].type == "solid"){
+                            if(this.tile_map[y][x][z].neighbors[0] === 0){
+                                verts.push(new p5.Vector(x*64, z*64, y*64));
+                                verts.push(new p5.Vector(x*64, z*64, (y+1)*64));
+                                verts.push(new p5.Vector(x*64, (z+1)*64, (y+1)*64));
+                                verts.push(new p5.Vector(x*64, (z+1)*64, y*64));
+                                facs.push(this.tile_map[y][x][z].imgs[0]);
+                            }
+                            if(this.tile_map[y][x][z].neighbors[1] === 0){
+                                verts.push(new p5.Vector((x+1)*64, z*64, y*64));
+                                verts.push(new p5.Vector((x+1)*64, z*64, (y+1)*64));
+                                verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+1)*64));
+                                verts.push(new p5.Vector((x+1)*64, (z+1)*64, y*64));
+                                facs.push(this.tile_map[y][x][z].imgs[1]);
+                            }
+                            if(this.tile_map[y][x][z].neighbors[2] === 0){
+                                verts.push(new p5.Vector((x+1)*64, z*64, y*64));
+                                verts.push(new p5.Vector(x*64, z*64, y*64));
+                                verts.push(new p5.Vector(x*64, (z+1)*64, y*64));
+                                verts.push(new p5.Vector((x+1)*64, (z+1)*64, y*64));
+                                facs.push(this.tile_map[y][x][z].imgs[2]);
+                            }
+                            if(this.tile_map[y][x][z].neighbors[3] === 0){
+                                verts.push(new p5.Vector((x+1)*64, z*64, (y+1)*64));
+                                verts.push(new p5.Vector(x*64, z*64, (y+1)*64));
+                                verts.push(new p5.Vector(x*64, (z+1)*64, (y+1)*64));
+                                verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+1)*64));
+                                facs.push(this.tile_map[y][x][z].imgs[3]);
+                            }
+                            if(this.tile_map[y][x][z].neighbors[4] === 0 || this.tile_map[y][x][z].neighbors[4] == 'player'){
+                                verts.push(new p5.Vector(x*64, z*64, y*64));
+                                verts.push(new p5.Vector((x+1)*64, z*64, y*64));
+                                verts.push(new p5.Vector((x+1)*64, z*64, (y+1)*64));
+                                verts.push(new p5.Vector(x*64, z*64, (y+1)*64));
+                                facs.push(this.tile_map[y][x][z].imgs[4]);
+                            }
+                            if(this.tile_map[y][x][z].neighbors[5] === 0){
+                                verts.push(new p5.Vector(x*64, (z+1)*64, y*64));
+                                verts.push(new p5.Vector((x+1)*64, (z+1)*64, y*64));
+                                verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+1)*64));
+                                verts.push(new p5.Vector(x*64, (z+1)*64, (y+1)*64));
+                                facs.push(this.tile_map[y][x][z].imgs[5]);
+                            }
                         }
-                        if(this.tile_map[y][x][z].neighbors[1] === 0){
-                            verts.push(new p5.Vector((x+1)*64, z*64, y*64));
-                            verts.push(new p5.Vector((x+1)*64, z*64, (y+1)*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+1)*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, y*64));
-                            facs.push(this.tile_map[y][x][z].imgs[1]);
-                        }
-                        if(this.tile_map[y][x][z].neighbors[2] === 0){
-                            verts.push(new p5.Vector((x+1)*64, z*64, y*64));
-                            verts.push(new p5.Vector(x*64, z*64, y*64));
-                            verts.push(new p5.Vector(x*64, (z+1)*64, y*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, y*64));
-                            facs.push(this.tile_map[y][x][z].imgs[2]);
-                        }
-                        if(this.tile_map[y][x][z].neighbors[3] === 0){
-                            verts.push(new p5.Vector((x+1)*64, z*64, (y+1)*64));
-                            verts.push(new p5.Vector(x*64, z*64, (y+1)*64));
-                            verts.push(new p5.Vector(x*64, (z+1)*64, (y+1)*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+1)*64));
-                            facs.push(this.tile_map[y][x][z].imgs[3]);
-                        }
-                        if(this.tile_map[y][x][z].neighbors[4] === 0){
-                            verts.push(new p5.Vector(x*64, z*64, y*64));
-                            verts.push(new p5.Vector((x+1)*64, z*64, y*64));
-                            verts.push(new p5.Vector((x+1)*64, z*64, (y+1)*64));
-                            verts.push(new p5.Vector(x*64, z*64, (y+1)*64));
-                            facs.push(this.tile_map[y][x][z].imgs[4]);
-                        }
-                        if(this.tile_map[y][x][z].neighbors[5] === 0){
-                            verts.push(new p5.Vector(x*64, (z+1)*64, y*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, y*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+1)*64));
-                            verts.push(new p5.Vector(x*64, (z+1)*64, (y+1)*64));
-                            facs.push(this.tile_map[y][x][z].imgs[5]);
+                        else if(this.tile_map[y][x][z].type == "entity"){
+                            verts.push(new p5.Vector(x*64, z*64, (y+0.5)*64));
+                            verts.push(new p5.Vector((x+1)*64, z*64, (y+0.5)*64));
+                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+0.5)*64));
+                            verts.push(new p5.Vector(x*64, (z+1)*64, (y+0.5)*64));
+                            
+                            facs.push(4);
                         }
                     }
                 }
@@ -103,10 +113,10 @@ class ClientChunk{
                 //Texture Stuff
                 
                 for(let i = 0; i < this.vertices.length/4; i++){
-                    this.uvs.push([facs[i]*0.25, 0.0]);
-                    this.uvs.push([(facs[i]*0.25)+0.25, 0.0]);
-                    this.uvs.push([(facs[i]*0.25)+0.25, 1.0]);
-                    this.uvs.push([facs[i]*0.25, 1.0]);
+                    this.uvs.push([facs[i]*(1/5), 0.0]);
+                    this.uvs.push([(facs[i]*(1/5))+(1/5), 0.0]);
+                    this.uvs.push([(facs[i]*(1/5))+(1/5), 1.0]);
+                    this.uvs.push([facs[i]*(1/5), 1.0]);
                     
                     this.faces.push([i*4,(i*4)+1,(i*4)+2]);
                     this.faces.push([(i*4)+2,(i*4)+3,i*4]);
@@ -217,66 +227,7 @@ class ClientChunk{
             for(let x = 0; x < xcount; x++){
                 this.tile_map[y][x] = [];
                 for(let z = 0; z < temp_tile_map.length; z++){
-                    if(temp_tile_map[z][y][x] !== "0" && temp_tile_map[z][y][x] !== "\n0"){
-                        
-                        let tempArr = temp_tile_map[z][y][x].split('.');
-                        for(let i = 0; i < tempArr.length; i++){
-                            if(parseInt(tempArr[i])+"" == tempArr[i]){
-                                tempArr[i] = parseInt(tempArr[i]);
-                            }
-                        }
-
-                        //use the type to create the right tile class
-                        if(tempArr[0] == 1){ //solid
-                            this.tile_map[y][x][z] = new ClientTile("solid", tile_name_map[tempArr[1]], tempArr[2], x, y, z);
-                        }
-                        else if(tempArr[0] == 2){ //liquid
-                            this.tile_map[y][x][z] = new ClientTile("liquid", tile_name_map[tempArr[1]], x, y, z);
-                        }
-                        else if(tempArr[0] == 3){ //entity
-                            this.tile_map[y][x][z] = new ClientTileEntity("entity", "player", tempArr[2], x, y, z, tempArr[4], tempArr[5]);
-                            this.tile_map[y][x][z].move_counter = tempArr[6];
-                            this.tile_map[y][x][z].id = tempArr[3];
-                            if(tempArr[tempArr.length-1] != '[]'){
-                                let tempArr2 = [];
-                                let tempArr3 = [];
-                                var pastBracket = false;
-                                for(let i = 0; i < tempArr.length; i++){
-                                    if(tempArr[i] !== parseInt(tempArr[i])){
-                                        if(tempArr[i][0] == '['){
-                                            pastBracket = true;
-                                        }
-                                    }
-                                    if(pastBracket){
-                                        if(tempArr[i][tempArr[i].length-2] == '≈'){
-                                            tempArr3.push(tempArr[i].split('≈')[0]);
-                                            tempArr2.push(tempArr3);
-                                            tempArr3 = [tempArr[i].split('≈')[1]];
-                                        }
-                                        else{
-                                            tempArr3.push(tempArr[i]);
-                                        }
-                                        if(tempArr[i][tempArr[i].length-1] == ']'){
-                                            break;
-                                        }
-                                    }
-                                }
-                                tempArr2[0][0] = tempArr2[0][0].replace('[', '');
-                                for(let i = 0; i < tempArr2.length; i++){
-                                    this.tile_map[y][x][z].inv[i] = new ClientItem(item_type_map[tempArr2[i][0]], item_name_map[tempArr2[i][1]], tempArr2[i][2], '');
-                                }
-                            }
-                        }
-                        else if(tempArr[0] == 4){ //facing
-                            this.tile_map[y][x][z] = new ClientTile("facing", tile_name_map[tempArr[1]], tempArr[2], x, y, z);
-                        }
-                        else{
-                            console.log("tile type not found client side " + tile_type_map[tempArr[0]]);
-                        }
-                    }
-                    else{
-                        this.tile_map[y][x][z] = 0;
-                    }
+                    this.tile_map[y][x][z] = strToClientTile(temp_tile_map[z][y][x], x, y, z);
                 }
             }
         }
@@ -317,5 +268,71 @@ class ClientMap{
         for(let i = 0; i < this.chunk_map.length; i++){
             this.chunk_map[i].render();
         }
+    }
+}
+
+function strToClientTile(str, x, y, z){
+    if(str === "0" || str === "\n0"){
+        return 0;
+    }
+
+    let tempArr = str.split('.');
+    for(let i = 0; i < tempArr.length; i++){
+        if(parseInt(tempArr[i])+"" == tempArr[i]){
+            tempArr[i] = parseInt(tempArr[i]);
+        }
+    }
+
+    let tempTile = 0;
+    //use the type to create the right tile class
+    if(tempArr[0] == 1){ //solid
+        tempTile = new ClientTile("solid", tile_name_map[tempArr[1]], tempArr[2], x, y, z);
+    }
+    else if(tempArr[0] == 2){ //liquid
+        tempTile = new ClientTile("liquid", tile_name_map[tempArr[1]], x, y, z);
+    }
+    else if(tempArr[0] == 3){ //entity
+        tempTile = new ClientTileEntity("entity", "player", tempArr[2], x, y, z, tempArr[4], tempArr[5]);
+        this.tile_map[y][x][z].move_counter = tempArr[6];
+        this.tile_map[y][x][z].id = tempArr[3];
+        if(tempArr[tempArr.length-1] != '[]'){
+            let tempArr2 = [];
+            let tempArr3 = [];
+            var pastBracket = false;
+            for(let i = 0; i < tempArr.length; i++){
+                if(tempArr[i] !== parseInt(tempArr[i])){
+                    if(tempArr[i][0] == '['){
+                        pastBracket = true;
+                    }
+                }
+                if(pastBracket){
+                    if(tempArr[i][tempArr[i].length-2] == '≈'){
+                        tempArr3.push(tempArr[i].split('≈')[0]);
+                        tempArr2.push(tempArr3);
+                        tempArr3 = [tempArr[i].split('≈')[1]];
+                    }
+                    else{
+                        tempArr3.push(tempArr[i]);
+                    }
+                    if(tempArr[i][tempArr[i].length-1] == ']'){
+                        break;
+                    }
+                }
+            }
+            tempArr2[0][0] = tempArr2[0][0].replace('[', '');
+            for(let i = 0; i < tempArr2.length; i++){
+                this.tile_map[y][x][z].inv[i] = new ClientItem(item_type_map[tempArr2[i][0]], item_name_map[tempArr2[i][1]], tempArr2[i][2], '');
+            }
+        }
+    }
+    else if(tempArr[0] == 4){ //facing
+        tempTile = new ClientTile("facing", tile_name_map[tempArr[1]], tempArr[2], x, y, z);
+    }
+    else{
+        console.log("tile type not found client side " + tile_type_map[tempArr[0]]);
+    }
+
+    if(tempTile != 0){
+        return tempTile;
     }
 }

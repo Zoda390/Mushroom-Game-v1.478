@@ -81,11 +81,12 @@ class ClientTile{ //a solid tile
 
 class ClientTileEntity extends ClientTile{
     constructor(name, hp, x, y, z){
-        super("Entity", name, hp, x, y, z);
+        super("entity", name, hp, x, y, z);
         this.facing = 0;
         this.offset = {x: 0, y: 0, z: 0};
-        this.m = tile_models[0];
+        this.m = this.makeModel(); //tile_models[0];
         this.m2 = tile_models[1];
+        this.id = 0;
         //cam.setPosition((this.pos.x+this.offset.x)*64, (this.pos.z+this.offset.z-5)*64, (this.pos.y+this.offset.y+10)*64);
     }
 
@@ -94,7 +95,7 @@ class ClientTileEntity extends ClientTile{
         layer0.translate((this.pos.x + this.offset.x + 0.5)*64, (this.pos.z + this.offset.z - 0.55)*64, (this.pos.y + this.offset.y + 0.5)*64);
         layer0.noStroke();
         layer0.texture(tile_imgs[this.imgs[0]]);
-        layer0.scale(150);
+        //layer0.scale(150);
         let v1 = createVector(cam.eyeX, cam.eyeZ);
         let v2 = createVector(0, 1);
         layer0.rotateY(v1.angleBetween(v2)+PI);
@@ -128,14 +129,14 @@ class ClientTileEntity extends ClientTile{
                 this.vertices.push(new p5.Vector(-0.5*64, 0.5*64, 0*64));
                 
                 this.uvs.push([0.0, 0.0]);
-                this.uvs.push([1.0, 0.0]);
-                this.uvs.push([1.0, 1.0]);
-                this.uvs.push([0.0, 1.0]);
+                this.uvs.push([0.5, 0.0]);
+                this.uvs.push([0.5, 0.5]);
+                this.uvs.push([0.0, 0.5]);
             
                 this.faces.push([0,1,2]);
                 this.faces.push([2,3,0]);
             }
-        )
+        );
     }
 
     move(key){
@@ -157,5 +158,9 @@ class ClientTileEntity extends ClientTile{
             this.offset.x = -1;
         }
         socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: "3.1.10."+this.id+'.'+this.offset.x+'.'+this.offset.y+'.'+this.offset.z})
+    }
+
+    toStr(){
+        return find_in_array(this.type, tile_type_map) + '.' + find_in_array(this.name, tile_name_map) + '.' + this.hp + '.' + this.id;
     }
 }

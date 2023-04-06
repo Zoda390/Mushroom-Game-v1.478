@@ -121,67 +121,7 @@ export class ServerChunk{
             for(let x = 0; x < xcount; x++){
                 this.tile_map[y][x] = [];
                 for(let z = 0; z < temp_tile_map.length; z++){
-                    if(temp_tile_map[z][y][x] !== "0" && temp_tile_map[z][y][x] !== "\n0"){
-                        let tempArr = temp_tile_map[z][y][x].split('.');
-                        for(let i = 0; i < tempArr.length; i++){
-                            if(parseInt(tempArr[i])+"" == tempArr[i]){
-                                tempArr[i] = parseInt(tempArr[i]);
-                            }
-                        }
-
-                        //use the type to create the right tile class
-                        if(tempArr[0] == 1){ //solid
-                            this.tile_map[y][x][z] = new ServerTile(1, tempArr[1], tempArr[2], x, y, z);
-                        }
-                        /*
-                        else if(tempArr[0] == 2){ //liquid
-                            this.tile_map[y][x][z] = new ServerTile("liquid", tile_name_map[tempArr[1]], x, y, z);
-                        }
-                        else if(tempArr[0] == 3){ //entity
-                            this.tile_map[y][x][z] = new ServerTileEntity("entity", "player", tempArr[2], x, y, z, tempArr[4], tempArr[5]);
-                            this.tile_map[y][x][z].move_counter = tempArr[6];
-                            this.tile_map[y][x][z].id = tempArr[3];
-                            if(tempArr[tempArr.length-1] != '[]'){
-                                let tempArr2 = [];
-                                let tempArr3 = [];
-                                var pastBracket = false;
-                                for(let i = 0; i < tempArr.length; i++){
-                                    if(tempArr[i] !== parseInt(tempArr[i])){
-                                        if(tempArr[i][0] == '['){
-                                            pastBracket = true;
-                                        }
-                                    }
-                                    if(pastBracket){
-                                        if(tempArr[i][tempArr[i].length-2] == '≈'){
-                                            tempArr3.push(tempArr[i].split('≈')[0]);
-                                            tempArr2.push(tempArr3);
-                                            tempArr3 = [tempArr[i].split('≈')[1]];
-                                        }
-                                        else{
-                                            tempArr3.push(tempArr[i]);
-                                        }
-                                        if(tempArr[i][tempArr[i].length-1] == ']'){
-                                            break;
-                                        }
-                                    }
-                                }
-                                tempArr2[0][0] = tempArr2[0][0].replace('[', '');
-                                for(let i = 0; i < tempArr2.length; i++){
-                                    this.tile_map[y][x][z].inv[i] = new ServerItem(item_type_map[tempArr2[i][0]], item_name_map[tempArr2[i][1]], tempArr2[i][2], '');
-                                }
-                            }
-                        }
-                        else if(tempArr[0] == 4){ //facing
-                            this.tile_map[y][x][z] = new ServerTile("facing", tile_name_map[tempArr[1]], tempArr[2], x, y, z);
-                        }
-                        */
-                        else{
-                            console.log("tile type not found server side " + tile_type_map[tempArr[0]]);
-                        }
-                    }
-                    else{
-                        this.tile_map[y][x][z] = 0;
-                    }
+                    this.tile_map[y][x][z] = strToServerTile(temp_tile_map[z][y][x], x, y, z);
                 }
             }
         }
@@ -289,5 +229,71 @@ export class ServerMap{
             chunks.push({x: this.chunk_map[i].pos.x, y: this.chunk_map[i].pos.y, txt: this.chunk_map[i].totxt()});
         }
         return chunks;
+    }
+}
+
+export function strToServerTile(str, x, y, z){
+    if(str === "0" || str === "\n0"){
+        return 0;
+    }
+
+    let tempArr = str.split('.');
+    for(let i = 0; i < tempArr.length; i++){
+        if(tempArr[i] == parseInt(tempArr[i]) + ''){
+            tempArr[i] = parseInt(tempArr[i]);
+        }
+    }
+
+    let tempTile = 0;
+    //use the type to create the right tile class
+    if(tempArr[0] == 1){ //solid
+        tempTile = new ServerTile(1, tempArr[1], tempArr[2], x, y, z);
+    }
+    else if(tempArr[0] == 2){ //liquid
+        tempTile = new ServerTile(2, tempArr[1], tempArr[2], x, y, z);
+    }
+    else if(tempArr[0] == 3){ //entity
+        tempTile = new ServerTileEntity(3, tempArr[1], tempArr[2], tempArr[4], tempArr[5]);
+        cs_map.tile_map[data.y][data.x][data.z].move_counter = tempArr[6];
+        cs_map.tile_map[data.y][data.x][data.z].id = tempArr[3];
+        if(tempArr[tempArr.length-1] != '[]'){
+            let tempArr2 = [];
+            let tempArr3 = [];
+            var pastBracket = false;
+            for(let i = 0; i < tempArr.length; i++){
+                if(tempArr[i] !== parseInt(tempArr[i])){
+                    if(tempArr[i][0] == '['){
+                        pastBracket = true;
+                    }
+                }
+                if(pastBracket){
+                    if(tempArr[i][tempArr[i].length-2] == '≈'){
+                        tempArr3.push(tempArr[i].split('≈')[0]);
+                        tempArr2.push(tempArr3);
+                        tempArr3 = [tempArr[i].split('≈')[1]];
+                    }
+                    else{
+                        tempArr3.push(tempArr[i]);
+                    }
+                    if(tempArr[i][tempArr[i].length-1] == ']'){
+                        break;
+                    }
+                }
+            }
+            tempArr2[0][0] = tempArr2[0][0].replace('[', '');
+            for(let i = 0; i < tempArr2.length; i++){
+                tempTile.inv[i] = new ServerItem(tempArr2[i][0], tempArr2[i][1], tempArr2[i][2], '');
+            }
+        }
+    }
+    else if(tempArr[0] == 4){ //facing
+        tempTile = new ServerTile(4, tempArr[1], tempArr[2]);
+    }
+    else{
+        console.log("tile type not found server side " + tempArr[0]);
+    }
+
+    if(tempTile != 0){
+        return tempTile;
     }
 }

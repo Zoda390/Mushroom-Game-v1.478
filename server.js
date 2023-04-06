@@ -4,7 +4,7 @@ import express from "express"
 import fs from "fs"
 import {ServerItem} from "./server-classes/item_classes.js"
 import {ServerTile, ServerTileEntity} from "./server-classes/tile_classes.js"
-import {ServerChunk, ServerMap} from "./server-classes/map_classes.js"
+import {ServerChunk, ServerMap, strToServerTile} from "./server-classes/map_classes.js"
 
 const port = 3000;
 const app = express();
@@ -132,22 +132,7 @@ io.sockets.on("connection", (socket) =>{
     socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
         for(let i = 0; i < cs_map.chunk_map.length; i++){
             if(data.cPos.x == cs_map.chunk_map[i].pos.x && data.cPos.y == cs_map.chunk_map[i].pos.y){
-                if(data.to != "0"){
-                    let tempArr = data.to.split('.');
-                    for(let i = 0; i < tempArr.length; i++){
-                        if(parseInt(tempArr[i])+"" == tempArr[i]){
-                            tempArr[i] = parseInt(tempArr[i]);
-                        }
-                    }
-
-                    //use the type to create the right tile class
-                    if(tempArr[0] == 1){ //solid
-                        cs_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = new ServerTile(1, tempArr[1], tempArr[2], data.tPos.x, data.tPos.y, data.tPos.z);
-                    }
-                }
-                else{
-                    cs_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = 0;
-                }
+                cs_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = strToServerTile(data.to, data.tPos.x, data.tPos.y, data.tPos.z);
                 io.emit('changeTile', data);
             }
         }

@@ -93,22 +93,7 @@ function preload(){
     socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
         for(let i = 0; i < cc_map.chunk_map.length; i++){
             if(data.cPos.x == cc_map.chunk_map[i].pos.x && data.cPos.y == cc_map.chunk_map[i].pos.y){
-                if(data.to != "0"){
-                    let tempArr = data.to.split('.');
-                    for(let i = 0; i < tempArr.length; i++){
-                        if(parseInt(tempArr[i])+"" == tempArr[i]){
-                            tempArr[i] = parseInt(tempArr[i]);
-                        }
-                    }
-
-                    //use the type to create the right tile class
-                    if(tempArr[0] == 1){ //solid
-                        cc_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = new ClientTile("solid", tile_name_map[tempArr[1]], tempArr[2], data.tPos.x, data.tPos.y, data.tPos.z);
-                    }
-                }
-                else{
-                    cc_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = 0;
-                }
+                cc_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = strToClientTile(data.to, data.tPos.x, data.tPos.y, data.tPos.z);
                 cc_map.chunk_map[i].make_model(false);
             }
         }
@@ -120,6 +105,7 @@ function preload(){
     tile_imgs.push(loadImage("map1/textures/grass_sides.png"));
     tile_imgs.push(loadImage("map1/textures/player.png"));
     tile_imgs.push(loadImage("map1/textures/player-top.png"));
+    tile_imgs.push(loadImage("map1/textures/player-front.png"));
     tile_models.push(loadModel("map1/models/player.obj"));
     tile_models.push(loadModel("map1/models/player.stl", true));
 }
@@ -144,12 +130,14 @@ function setup() {
     layer1.background(100);
     layer1.noStroke();
 
-    atlas = createGraphics(64*4, 64);
-    atlas.background(255, 255, 0);
+    atlas = createGraphics(64*5, 64);
+    atlas.background(0, 255, 0);
     atlas.image(tile_imgs[0], 0, 0);
     atlas.image(tile_imgs[1], 64, 0);
     atlas.image(tile_imgs[2], 64*2, 0);
     atlas.image(tile_imgs[3], 64*3, 0);
+    atlas.image(tile_imgs[6], 64*4, 0);
+    
 
     noStroke();
     slider = createSlider(1, width, width, 1);
@@ -205,6 +193,7 @@ function draw() {
     for(let i = 0; i < loading_map.length; i++){
         rect((loading_map[i].x-min_x)*((64/8)+1), (loading_map[i].y-min_y)*((64/8)+1), (64/8), (64/8));
     }
+    image(atlas, 0, 0);
 }
 
 var move_right_button = 68; //d
