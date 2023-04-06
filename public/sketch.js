@@ -60,7 +60,7 @@ function preload(){
         loading_map = [];
     });
 
-    //a string version of a chunk
+    //a string version of a chunk (no used)
     socket.on('open_chunk', (data) => {
         let temp = new ClientChunk(data.x, data.y, false);
         temp.fromStr(data.file);
@@ -88,6 +88,30 @@ function preload(){
             console.log(cc_map);
         }
         */
+    });
+
+    socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
+        for(let i = 0; i < cc_map.chunk_map.length; i++){
+            if(data.cPos.x == cc_map.chunk_map[i].pos.x && data.cPos.y == cc_map.chunk_map[i].pos.y){
+                if(data.to != "0"){
+                    let tempArr = data.to.split('.');
+                    for(let i = 0; i < tempArr.length; i++){
+                        if(parseInt(tempArr[i])+"" == tempArr[i]){
+                            tempArr[i] = parseInt(tempArr[i]);
+                        }
+                    }
+
+                    //use the type to create the right tile class
+                    if(tempArr[0] == 1){ //solid
+                        cc_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = new ClientTile("solid", tile_name_map[tempArr[1]], tempArr[2], data.tPos.x, data.tPos.y, data.tPos.z);
+                    }
+                }
+                else{
+                    cc_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = 0;
+                }
+                cc_map.chunk_map[i].make_model(false);
+            }
+        }
     });
 
     tile_imgs.push(loadImage("map1/textures/stone_all.png"));
@@ -156,7 +180,7 @@ function draw() {
     //layer0.rotateY(frameCount * 0.01);
     oc();
     takeInput();
-    if(loading_map.length == 9){
+    if(loading_map.length >= 9){
         cc_map.render();
         e1.render();
     }

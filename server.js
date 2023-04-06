@@ -127,5 +127,29 @@ io.sockets.on("connection", (socket) =>{
         socket.emit('change', {x: data.x, y: data.y, z: data.z, to: cs_map.tile_map[data.y][data.x][data.z].toStr()});
         player_count++;
         */
-    })
+    });
+
+    socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
+        for(let i = 0; i < cs_map.chunk_map.length; i++){
+            if(data.cPos.x == cs_map.chunk_map[i].pos.x && data.cPos.y == cs_map.chunk_map[i].pos.y){
+                if(data.to != "0"){
+                    let tempArr = data.to.split('.');
+                    for(let i = 0; i < tempArr.length; i++){
+                        if(parseInt(tempArr[i])+"" == tempArr[i]){
+                            tempArr[i] = parseInt(tempArr[i]);
+                        }
+                    }
+
+                    //use the type to create the right tile class
+                    if(tempArr[0] == 1){ //solid
+                        cs_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = new ServerTile(1, tempArr[1], tempArr[2], data.tPos.x, data.tPos.y, data.tPos.z);
+                    }
+                }
+                else{
+                    cs_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = 0;
+                }
+                io.emit('changeTile', data);
+            }
+        }
+    });
 });

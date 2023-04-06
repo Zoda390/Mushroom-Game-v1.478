@@ -28,30 +28,48 @@ class ClientTile{ //a solid tile
             if(tile_map[this.pos.y][this.pos.x-1][this.pos.z] !== 0){
                 this.neighbors[0] = tile_map[this.pos.y][this.pos.x-1][this.pos.z].name;
             }
+            else{
+                this.neighbors[0] = 0;
+            }
         }
         if(this.pos.x != tile_map[0].length-1){ //east
             if(tile_map[this.pos.y][this.pos.x+1][this.pos.z] !== 0){
                 this.neighbors[1] = tile_map[this.pos.y][this.pos.x+1][this.pos.z].name;
+            }
+            else{
+                this.neighbors[1] = 0;
             }
         }
         if(this.pos.y != 0){ //north
             if(tile_map[this.pos.y-1][this.pos.x][this.pos.z] !== 0){
                 this.neighbors[2] = tile_map[this.pos.y-1][this.pos.x][this.pos.z].name;
             }
+            else{
+                this.neighbors[2] = 0;
+            }
         }
         if(this.pos.y != tile_map.length-1){ //south
             if(tile_map[this.pos.y+1][this.pos.x][this.pos.z] !== 0){
                 this.neighbors[3] = tile_map[this.pos.y+1][this.pos.x][this.pos.z].name;
+            }
+            else{
+                this.neighbors[3] = 0;
             }
         }
         if(this.pos.z != 0){ //up
             if(tile_map[this.pos.y][this.pos.x][this.pos.z-1] !== 0){
                 this.neighbors[4] = tile_map[this.pos.y][this.pos.x][this.pos.z-1].name;
             }
+            else{
+                this.neighbors[4] = 0;
+            }
         }
         if(this.pos.z != tile_map[0][0].length-1){ //down
             if(tile_map[this.pos.y][this.pos.x][this.pos.z+1] !== 0){
                 this.neighbors[5] = tile_map[this.pos.y][this.pos.x][this.pos.z+1].name;
+            }
+            else{
+                this.neighbors[5] = 0;
             }
         }
     }
@@ -68,7 +86,6 @@ class ClientTileEntity extends ClientTile{
         this.offset = {x: 0, y: 0, z: 0};
         this.m = tile_models[0];
         this.m2 = tile_models[1];
-        this.rm = "2D";
         //cam.setPosition((this.pos.x+this.offset.x)*64, (this.pos.z+this.offset.z-5)*64, (this.pos.y+this.offset.y+10)*64);
     }
 
@@ -122,6 +139,7 @@ class ClientTileEntity extends ClientTile{
     }
 
     move(key){
+        socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: '0'});
         if(key == "w"){
             this.pos.y -= 1;
             this.offset.y = 1;
@@ -138,5 +156,6 @@ class ClientTileEntity extends ClientTile{
             this.pos.x += 1;
             this.offset.x = -1;
         }
+        socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: "3.1.10."+this.id+'.'+this.offset.x+'.'+this.offset.y+'.'+this.offset.z})
     }
 }
