@@ -143,7 +143,7 @@ function setup() {
     slider = createSlider(1, width, width, 1);
     slider.position(1, height+40);
     slider.style('width', width+"px");
-    socket.emit("join");
+    socket.emit("join", {cPos: {x: -1, y: -1}, tPos: {x:1,y:1,z:3}});
 
     cam = layer0.createCamera();
 }
