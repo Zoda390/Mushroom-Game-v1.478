@@ -8,6 +8,7 @@ var deltaTheta = 0;
 var deltaPhi = 0;
 var cc_map; //current client map
 var atlas;
+var atlasLength = 4;
 var cam;
 var socket;
 var loading_map = [];
@@ -93,7 +94,7 @@ function preload(){
     socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
         for(let i = 0; i < cc_map.chunk_map.length; i++){
             if(data.cPos.x == cc_map.chunk_map[i].pos.x && data.cPos.y == cc_map.chunk_map[i].pos.y){
-                cc_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = strToClientTile(data.to, data.tPos.x, data.tPos.y, data.tPos.z);
+                strToClientTile(cc_map.chunk_map[i], data.to, data.tPos.x, data.tPos.y, data.tPos.z);
                 cc_map.chunk_map[i].make_model(false);
             }
         }
@@ -130,13 +131,12 @@ function setup() {
     layer1.background(100);
     layer1.noStroke();
 
-    atlas = createGraphics(64*5, 64);
+    atlas = createGraphics(64*atlasLength, 64);
     atlas.background(0, 255, 0);
     atlas.image(tile_imgs[0], 0, 0);
     atlas.image(tile_imgs[1], 64, 0);
     atlas.image(tile_imgs[2], 64*2, 0);
     atlas.image(tile_imgs[3], 64*3, 0);
-    atlas.image(tile_imgs[6], 64*4, 0);
     
 
     noStroke();
@@ -146,7 +146,6 @@ function setup() {
     socket.emit("join");
 
     cam = layer0.createCamera();
-    e1 = new ClientTileEntity("player", 50, 0, 0, 4);
 }
 
 function draw() {
@@ -170,7 +169,6 @@ function draw() {
     takeInput();
     if(loading_map.length >= 9){
         cc_map.render();
-        e1.render();
     }
     layer0.pop();
     layer1.rect(0, 0, width, height);
@@ -193,7 +191,6 @@ function draw() {
     for(let i = 0; i < loading_map.length; i++){
         rect((loading_map[i].x-min_x)*((64/8)+1), (loading_map[i].y-min_y)*((64/8)+1), (64/8), (64/8));
     }
-    image(atlas, 0, 0);
 }
 
 var move_right_button = 68; //d

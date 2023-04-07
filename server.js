@@ -132,7 +132,7 @@ io.sockets.on("connection", (socket) =>{
     socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
         for(let i = 0; i < cs_map.chunk_map.length; i++){
             if(data.cPos.x == cs_map.chunk_map[i].pos.x && data.cPos.y == cs_map.chunk_map[i].pos.y){
-                cs_map.chunk_map[i].tile_map[data.tPos.y][data.tPos.x][data.tPos.z] = strToServerTile(data.to, data.tPos.x, data.tPos.y, data.tPos.z);
+                strToServerTile(cs_map.chunk_map[i], data.to, data.tPos.x, data.tPos.y, data.tPos.z);
                 io.emit('changeTile', data);
             }
         }

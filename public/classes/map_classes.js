@@ -31,6 +31,8 @@ class ClientChunk{
         }
         this.model_iteratoin = 0;
         this.make_model(load);
+
+        this.entities = [];
     }
     
     make_model(load){
@@ -90,14 +92,6 @@ class ClientChunk{
                                 facs.push(this.tile_map[y][x][z].imgs[5]);
                             }
                         }
-                        else if(this.tile_map[y][x][z].type == "entity"){
-                            verts.push(new p5.Vector(x*64, z*64, (y+0.5)*64));
-                            verts.push(new p5.Vector((x+1)*64, z*64, (y+0.5)*64));
-                            verts.push(new p5.Vector((x+1)*64, (z+1)*64, (y+0.5)*64));
-                            verts.push(new p5.Vector(x*64, (z+1)*64, (y+0.5)*64));
-                            
-                            facs.push(4);
-                        }
                     }
                 }
             }
@@ -113,10 +107,10 @@ class ClientChunk{
                 //Texture Stuff
                 
                 for(let i = 0; i < this.vertices.length/4; i++){
-                    this.uvs.push([facs[i]*(1/5), 0.0]);
-                    this.uvs.push([(facs[i]*(1/5))+(1/5), 0.0]);
-                    this.uvs.push([(facs[i]*(1/5))+(1/5), 1.0]);
-                    this.uvs.push([facs[i]*(1/5), 1.0]);
+                    this.uvs.push([facs[i]*(1/atlasLength), 0.0]);
+                    this.uvs.push([(facs[i]*(1/atlasLength))+(1/atlasLength), 0.0]);
+                    this.uvs.push([(facs[i]*(1/atlasLength))+(1/atlasLength), 1.0]);
+                    this.uvs.push([facs[i]*(1/atlasLength), 1.0]);
                     
                     this.faces.push([i*4,(i*4)+1,(i*4)+2]);
                     this.faces.push([(i*4)+2,(i*4)+3,i*4]);
@@ -137,9 +131,15 @@ class ClientChunk{
             layer0.model(this.m);
         }
         layer0.translate(-this.pos.x*this.tile_map[0].length*64, 0, -this.pos.y*this.tile_map.length*64);
+
+        for(let i = 0; i < this.entities.length; i++){
+            this.entities[i].render(this.pos.x, this.pos.y);
+        }
     }
 
     totxt(){ //convert the map to txt format
+        //convert entities to a list of beakpoints to be dealt with later
+        
         //~ for the end of a tile
         //~~ for the end of a y section
         //~~~ for the end of a z section
@@ -227,7 +227,7 @@ class ClientChunk{
             for(let x = 0; x < xcount; x++){
                 this.tile_map[y][x] = [];
                 for(let z = 0; z < temp_tile_map.length; z++){
-                    this.tile_map[y][x][z] = strToClientTile(temp_tile_map[z][y][x], x, y, z);
+                    strToClientTile(this, temp_tile_map[z][y][x], x, y, z);
                 }
             }
         }
@@ -271,9 +271,10 @@ class ClientMap{
     }
 }
 
-function strToClientTile(str, x, y, z){
+function strToClientTile(chunk, str, x, y, z){
     if(str === "0" || str === "\n0"){
-        return 0;
+        chunk.tile_map[y][x][z] = 0;
+        return;
     }
 
     let tempArr = str.split('.');
@@ -292,9 +293,14 @@ function strToClientTile(str, x, y, z){
         tempTile = new ClientTile("liquid", tile_name_map[tempArr[1]], x, y, z);
     }
     else if(tempArr[0] == 3){ //entity
-        tempTile = new ClientTileEntity("entity", "player", tempArr[2], x, y, z, tempArr[4], tempArr[5]);
-        this.tile_map[y][x][z].move_counter = tempArr[6];
-        this.tile_map[y][x][z].id = tempArr[3];
+        tempTile = new ClientTileEntity("player", tempArr[2], x, y, z, tempArr[4], tempArr[5]);
+        tempTile.move_counter = tempArr[6];
+        tempTile.id = tempArr[3];
+        let tempOffsets = tempArr[tempArr.length-2].toString();
+        tempOffsets = tempOffsets.split('');
+        tempTile.offset.x = parseInt(tempOffsets[0]);
+        tempTile.offset.y = parseInt(tempOffsets[1]);
+        tempTile.offset.z = parseInt(tempOffsets[2]);
         if(tempArr[tempArr.length-1] != '[]'){
             let tempArr2 = [];
             let tempArr3 = [];
@@ -321,9 +327,12 @@ function strToClientTile(str, x, y, z){
             }
             tempArr2[0][0] = tempArr2[0][0].replace('[', '');
             for(let i = 0; i < tempArr2.length; i++){
-                this.tile_map[y][x][z].inv[i] = new ClientItem(item_type_map[tempArr2[i][0]], item_name_map[tempArr2[i][1]], tempArr2[i][2], '');
+                tempTile.inv[i] = new ClientItem(item_type_map[tempArr2[i][0]], item_name_map[tempArr2[i][1]], tempArr2[i][2], '');
             }
         }
+
+        chunk.entities.push(tempTile);
+        tempTile = 0;
     }
     else if(tempArr[0] == 4){ //facing
         tempTile = new ClientTile("facing", tile_name_map[tempArr[1]], tempArr[2], x, y, z);
@@ -333,6 +342,6 @@ function strToClientTile(str, x, y, z){
     }
 
     if(tempTile != 0){
-        return tempTile;
+        chunk.tile_map[y][x][z] = tempTile;
     }
 }

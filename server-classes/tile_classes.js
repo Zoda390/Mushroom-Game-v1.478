@@ -51,10 +51,11 @@ export class ServerTile{
 }
 
 export class ServerTileEntity extends ServerTile{
-    constructor(type, name, hp, team, facing){
+    constructor(type, name, hp, team, angle){
         super(type, name, hp);
         this.team = team;
-        this.facing = facing; //an int for which direction the entity is facing
+        this.angle = angle; //an int for the angle which determines the direction the entity is facing
+        this.offsets = "000";
         this.move_counter = 0;
         this.walk_wait = 10; //frames before you can walk again
         this.run_wait = 5; //frames before you can run again
@@ -67,6 +68,7 @@ export class ServerTileEntity extends ServerTile{
         for(let i = 0; i < this.inv.length; i++){
             invStr += this.inv[i].toStr();
         }
-        return this.type + '.' + this.name + '.' + this.hp + '.' + this.id + '.' + this.team + '.' + this.facing + '.' + this.move_counter + '.[' + invStr + ']';
+
+        return this.type + '.' + this.name + '.' + this.hp + '.' + this.id + '.' + this.team + '.' + this.angle + '.' + this.move_counter + '.' + this.offsets + '.[' + invStr + ']';
     }
 }

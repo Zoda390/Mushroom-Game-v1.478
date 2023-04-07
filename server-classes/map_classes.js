@@ -1,5 +1,5 @@
 import fs from 'fs'
-import {ServerTile} from "./tile_classes.js"
+import {ServerTile, ServerTileEntity} from "./tile_classes.js"
 
 export class ServerChunk{
     constructor(x, y){
@@ -31,6 +31,8 @@ export class ServerChunk{
                 }
             }
         }
+
+        this.entities = [];
     }
 
     totxt(){ //convert the map to txt format
@@ -121,7 +123,7 @@ export class ServerChunk{
             for(let x = 0; x < xcount; x++){
                 this.tile_map[y][x] = [];
                 for(let z = 0; z < temp_tile_map.length; z++){
-                    this.tile_map[y][x][z] = strToServerTile(temp_tile_map[z][y][x], x, y, z);
+                    strToServerTile(this, temp_tile_map[z][y][x], x, y, z);
                 }
             }
         }
@@ -232,9 +234,10 @@ export class ServerMap{
     }
 }
 
-export function strToServerTile(str, x, y, z){
+export function strToServerTile(chunk, str, x, y, z){
     if(str === "0" || str === "\n0"){
-        return 0;
+        chunk.tile_map[y][x][z] = 0;
+        return;
     }
 
     let tempArr = str.split('.');
@@ -252,10 +255,11 @@ export function strToServerTile(str, x, y, z){
     else if(tempArr[0] == 2){ //liquid
         tempTile = new ServerTile(2, tempArr[1], tempArr[2], x, y, z);
     }
-    else if(tempArr[0] == 3){ //entity
+    else if(tempArr[0] == 3){ //entity  3.tileName.Hp.Id.team.angle.move_counter.[item≈item≈...]
         tempTile = new ServerTileEntity(3, tempArr[1], tempArr[2], tempArr[4], tempArr[5]);
-        cs_map.tile_map[data.y][data.x][data.z].move_counter = tempArr[6];
-        cs_map.tile_map[data.y][data.x][data.z].id = tempArr[3];
+        tempTile.move_counter = tempArr[6];
+        tempTile.id = tempArr[3];
+        tempTile.offsets = tempArr[tempArr.length-2];
         if(tempArr[tempArr.length-1] != '[]'){
             let tempArr2 = [];
             let tempArr3 = [];
@@ -284,7 +288,11 @@ export function strToServerTile(str, x, y, z){
             for(let i = 0; i < tempArr2.length; i++){
                 tempTile.inv[i] = new ServerItem(tempArr2[i][0], tempArr2[i][1], tempArr2[i][2], '');
             }
+            
         }
+        
+        chunk.entities.push(tempTile);
+        tempTile = 0;
     }
     else if(tempArr[0] == 4){ //facing
         tempTile = new ServerTile(4, tempArr[1], tempArr[2]);
@@ -294,6 +302,6 @@ export function strToServerTile(str, x, y, z){
     }
 
     if(tempTile != 0){
-        return tempTile;
+        chunk.tile_map[y][x][z] = tempTile;
     }
 }

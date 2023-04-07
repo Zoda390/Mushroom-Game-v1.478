@@ -82,20 +82,26 @@ class ClientTile{ //a solid tile
 class ClientTileEntity extends ClientTile{
     constructor(name, hp, x, y, z){
         super("entity", name, hp, x, y, z);
-        this.facing = 0;
+        this.team = 0;
+        this.angle = 0; //an int for the angle which determines the direction the entity is facing (0 to 359)
         this.offset = {x: 0, y: 0, z: 0};
-        this.m = this.makeModel(); //tile_models[0];
-        this.m2 = tile_models[1];
+        this.move_counter = 0;
+        this.walk_wait = 10; //frames before you can walk again
+        this.run_wait = 5; //frames before you can run again
+        this.m = tile_models[0];
         this.id = 0;
+        this.move_counter = 0;
+        this.inv = [];
+
         //cam.setPosition((this.pos.x+this.offset.x)*64, (this.pos.z+this.offset.z-5)*64, (this.pos.y+this.offset.y+10)*64);
     }
 
-    render(){
+    render(cx, cy){
         layer0.push();
-        layer0.translate((this.pos.x + this.offset.x + 0.5)*64, (this.pos.z + this.offset.z - 0.55)*64, (this.pos.y + this.offset.y + 0.5)*64);
+        layer0.translate((cx*30*64)+(this.pos.x + this.offset.x + 0.5)*64, (this.pos.z + this.offset.z - 0.55)*64, (cy*30*64)+(this.pos.y + this.offset.y + 0.5)*64);
         layer0.noStroke();
         layer0.texture(tile_imgs[this.imgs[0]]);
-        //layer0.scale(150);
+        layer0.scale(150);
         let v1 = createVector(cam.eyeX, cam.eyeZ);
         let v2 = createVector(0, 1);
         layer0.rotateY(v1.angleBetween(v2)+PI);
@@ -117,29 +123,21 @@ class ClientTileEntity extends ClientTile{
         else{
             this.offset.y = 0;
         }
-    }
 
-    makeModel(){
-        return new p5.Geometry(1,1,
-            function(){
-                this.vertices = [];
-                this.vertices.push(new p5.Vector(-0.5*64, -0.5*64, 0*64));
-                this.vertices.push(new p5.Vector(0.5*64, -0.5*64, 0*64));
-                this.vertices.push(new p5.Vector(0.5*64, 0.5*64, 0*64));
-                this.vertices.push(new p5.Vector(-0.5*64, 0.5*64, 0*64));
-                
-                this.uvs.push([0.0, 0.0]);
-                this.uvs.push([0.5, 0.0]);
-                this.uvs.push([0.5, 0.5]);
-                this.uvs.push([0.0, 0.5]);
-            
-                this.faces.push([0,1,2]);
-                this.faces.push([2,3,0]);
-            }
-        );
+        if(Math.abs(this.offset.z) > 0.01){
+            this.offset.z *= 0.8;
+        }
+        else{
+            this.offset.z = 0;
+        }
+
+        this.move_counter++;
     }
 
     move(key){
+        if(this.move_counter < this.walk_wait){
+            return;
+        }
         socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: '0'});
         if(key == "w"){
             this.pos.y -= 1;
@@ -157,10 +155,19 @@ class ClientTileEntity extends ClientTile{
             this.pos.x += 1;
             this.offset.x = -1;
         }
-        socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: "3.1.10."+this.id+'.'+this.offset.x+'.'+this.offset.y+'.'+this.offset.z})
+        socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: this.toStr()});
     }
 
     toStr(){
-        return find_in_array(this.type, tile_type_map) + '.' + find_in_array(this.name, tile_name_map) + '.' + this.hp + '.' + this.id;
+        let invStr = "";
+        for(let i = 0; i < this.inv.length; i++){
+            invStr += this.inv[i].toStr();
+        }
+        let offsetStr = "";
+        offsetStr += (Math.abs(this.offset.x) > 0.01)? '1':'0';
+        offsetStr += (Math.abs(this.offset.y) > 0.01)? '1':'0';
+        offsetStr += (Math.abs(this.offset.z) > 0.01)? '1':'0';
+
+        return '3.' + find_in_array(this.name, tile_name_map) + '.' + this.hp + '.' + this.id + '.' + this.team + '.' + this.angle + '.' + this.move_counter + '.' + offsetStr + '.[' + invStr + ']';
     }
 }
