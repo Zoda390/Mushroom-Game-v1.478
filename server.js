@@ -15,6 +15,7 @@ console.log("My server is running on port " + port);
 
 
 var cur_file;
+var player_count = 0;
 
 //open a json file and make map for names and types
 var rules_obj = fs.readFileSync("public/map1/rules.json");
@@ -117,23 +118,34 @@ io.sockets.on("connection", (socket) =>{
     socket.on('join', (data) => {
         //convert the map to a string and send it to the player
         socket.emit('give_world', {name: cs_map.name, seed: cs_map.seed, ver: cs_map.ver, chunks: cs_map.totxt()});
-
+        
         //add a player to the map
-        /*
-        cs_map.tile_map[data.y][data.x][data.z] = new ServerTileEntity(find_in_array("entity", tile_type_map), find_in_array("player", tile_name_map), 100, (player_count%2), 0);
-        cs_map.tile_map[data.y][data.x][data.z].id = data.id;
-        cs_map.tile_map[data.y][data.x][data.z].inv[0] = new ServerItem(2, 5, 1, '');
-        cs_map.tile_map[data.y][data.x][data.z].inv[1] = new ServerItem(1, 4, 10, '');
-        socket.emit('change', {x: data.x, y: data.y, z: data.z, to: cs_map.tile_map[data.y][data.x][data.z].toStr()});
+        cs_map.chunk_map[0].entities.push(new ServerTileEntity(3, 1, 100, (player_count%2), 0, 0, 0, 3));
+        cs_map.chunk_map[0].entities[cs_map.chunk_map[0].entities.length-1].id = data.id;
+        //cs_map.tile_map[data.y][data.x][data.z].inv[0] = new ServerItem(2, 5, 1, '');
+        //cs_map.tile_map[data.y][data.x][data.z].inv[1] = new ServerItem(1, 4, 10, '');
+        socket.emit('change_tile', {cPos: {x: -1, y: -1}, tPos: {x: 0, y: 0, z: 3}, to: cs_map.chunk_map[0].entities[cs_map.chunk_map[0].entities.length-1].toStr()});
         player_count++;
-        */
     });
 
-    socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
+    socket.on('change_tile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
         for(let i = 0; i < cs_map.chunk_map.length; i++){
             if(data.cPos.x == cs_map.chunk_map[i].pos.x && data.cPos.y == cs_map.chunk_map[i].pos.y){
                 strToServerTile(cs_map.chunk_map[i], data.to, data.tPos.x, data.tPos.y, data.tPos.z);
-                io.emit('changeTile', data);
+                io.emit('change_tile', data);
+            }
+        }
+    });
+
+    socket.on('kill_entity', (data) => { //{cPos: {x: int, y: int}, id: str}
+        for(let i = 0; i < cs_map.chunk_map.length; i++){
+            if(data.cPos.x == cs_map.chunk_map[i].pos.x && data.cPos.y == cs_map.chunk_map[i].pos.y){
+                for(let j = 0; j < cs_map.chunk_map[i].entities.length; j++){
+                    if(cs_map.chunk_map[i].entities[j].id == data.id){
+                        cs_map.chunk_map[i].entities.splice(j, 1);
+                        io.emit('kill_entity', data);
+                    }
+                }
             }
         }
     });

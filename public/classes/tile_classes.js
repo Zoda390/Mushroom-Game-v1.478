@@ -136,9 +136,9 @@ class ClientTileEntity extends ClientTile{
 
     move(key){
         if(this.move_counter < this.walk_wait){
-            return;
+            return false;
         }
-        socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: '0'});
+        socket.emit("kill_entity", {cPos: {x: -1, y: -1}, id: this.id});
         if(key == "w"){
             this.pos.y -= 1;
             this.offset.y = 1;
@@ -155,7 +155,9 @@ class ClientTileEntity extends ClientTile{
             this.pos.x += 1;
             this.offset.x = -1;
         }
-        socket.emit("changeTile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: this.toStr()});
+        this.move_counter = 0;
+        socket.emit("change_tile", {cPos: {x: -1, y: -1}, tPos: this.pos, to: this.toStr()});
+        return true;
     }
 
     toStr(){
@@ -164,9 +166,9 @@ class ClientTileEntity extends ClientTile{
             invStr += this.inv[i].toStr();
         }
         let offsetStr = "";
-        offsetStr += (Math.abs(this.offset.x) > 0.01)? '1':'0';
-        offsetStr += (Math.abs(this.offset.y) > 0.01)? '1':'0';
-        offsetStr += (Math.abs(this.offset.z) > 0.01)? '1':'0';
+        offsetStr += (Math.abs(this.offset.x) > 0.01)? ((this.offset.x > 0)? '1':'2'):'0';
+        offsetStr += (Math.abs(this.offset.y) > 0.01)? ((this.offset.y > 0)? '1':'2'):'0';
+        offsetStr += (Math.abs(this.offset.z) > 0.01)? ((this.offset.z > 0)? '1':'2'):'0';
 
         return '3.' + find_in_array(this.name, tile_name_map) + '.' + this.hp + '.' + this.id + '.' + this.team + '.' + this.angle + '.' + this.move_counter + '.' + offsetStr + '.[' + invStr + ']';
     }

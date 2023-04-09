@@ -13,6 +13,7 @@ var cam;
 var socket;
 var loading_map = [];
 var chunk_load_wait = 0;
+var cp; //current player reference
 
 function preload(){
     socket = io.connect('http://localhost:3000');
@@ -91,11 +92,26 @@ function preload(){
         */
     });
 
-    socket.on('changeTile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
+    socket.on('change_tile', (data) => { //{cPos: {x: int, y: int}, tPos: {x: int, y: int, z: int}, to: str}
         for(let i = 0; i < cc_map.chunk_map.length; i++){
             if(data.cPos.x == cc_map.chunk_map[i].pos.x && data.cPos.y == cc_map.chunk_map[i].pos.y){
                 strToClientTile(cc_map.chunk_map[i], data.to, data.tPos.x, data.tPos.y, data.tPos.z);
                 cc_map.chunk_map[i].make_model(false);
+                if(cc_map.chunk_map[i].entities[cc_map.chunk_map[i].entities.length-1].id == socket.id){
+                    cp = cc_map.chunk_map[i].entities[cc_map.chunk_map[i].entities.length-1];
+                }
+            }
+        }
+    });
+
+    socket.on('kill_entity', (data) => { //{cPos: {x: int, y: int}, id: str}
+        for(let i = 0; i < cc_map.chunk_map.length; i++){
+            if(data.cPos.x == cc_map.chunk_map[i].pos.x && data.cPos.y == cc_map.chunk_map[i].pos.y){
+                for(let j=0; j<cc_map.chunk_map[i].entities.length; j++){
+                    if(cc_map.chunk_map[i].entities[j].id == data.id){
+                        cc_map.chunk_map[i].entities.splice(j, 1);
+                    }
+                }
             }
         }
     });
@@ -143,7 +159,7 @@ function setup() {
     slider = createSlider(1, width, width, 1);
     slider.position(1, height+40);
     slider.style('width', width+"px");
-    socket.emit("join");
+    socket.emit("join", {id: socket.id});
 
     cam = layer0.createCamera();
 }
@@ -206,26 +222,30 @@ var rotate_cam_down_button;
 
 function takeInput(){
     if (keyIsDown(move_right_button)){
-        cam.move(0.25*64*Math.cos(deltaTheta), 0, -0.25*64*Math.sin(deltaTheta));
-        //e1.move("d");
+        if(cp.move("d")){
+            cam.move(1*64*Math.cos(deltaTheta), 0, -1*64*Math.sin(deltaTheta));
+        }
     }
     if (keyIsDown(move_left_button)){
-        cam.move(-0.25*64*Math.cos(deltaTheta), 0, 0.25*64*Math.sin(deltaTheta));
-        //e1.move("a");
+        if(cp.move("a")){
+            cam.move(-1*64*Math.cos(deltaTheta), 0, 1*64*Math.sin(deltaTheta));
+        }
     }
     if (keyIsDown(move_up_button)){
-        cam.move(-0.25*64*Math.sin(deltaTheta), 0, -0.25*64*Math.cos(deltaTheta));
-        //e1.move("w");
+        if(cp.move("w")){
+            cam.move(-1*64*Math.sin(deltaTheta), 0, -1*64*Math.cos(deltaTheta));
+        }
     }
     if (keyIsDown(move_down_button)){
-        cam.move(0.25*64*Math.sin(deltaTheta), 0, 0.25*64*Math.cos(deltaTheta));
-        //e1.move("s");
+        if(cp.move("s")){
+            cam.move(1*64*Math.sin(deltaTheta), 0, 1*64*Math.cos(deltaTheta));
+        }
     }
     if (keyIsDown(move_fly_up_button)){
-        cam.move(0, 0.25*64, 0);
+        cam.move(0, 1*64, 0);
     }
     if (keyIsDown(move_fly_down_button)){
-        cam.move(0, -0.25*64, 0);
+        cam.move(0, -1*64, 0);
     }
 
     if (keyIsDown(rotate_cam_right_button)){

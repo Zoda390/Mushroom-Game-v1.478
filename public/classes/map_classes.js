@@ -298,9 +298,9 @@ function strToClientTile(chunk, str, x, y, z){
         tempTile.id = tempArr[3];
         let tempOffsets = tempArr[tempArr.length-2].toString();
         tempOffsets = tempOffsets.split('');
-        tempTile.offset.x = parseInt(tempOffsets[0]);
-        tempTile.offset.y = parseInt(tempOffsets[1]);
-        tempTile.offset.z = parseInt(tempOffsets[2]);
+        tempTile.offset.x = (parseInt(tempOffsets[0]) == 2)? -1:parseInt(tempOffsets[0]);
+        tempTile.offset.y = (parseInt(tempOffsets[1]) == 2)? -1:parseInt(tempOffsets[1]);
+        tempTile.offset.z = (parseInt(tempOffsets[2]) == 2)? -1:parseInt(tempOffsets[2]);
         if(tempArr[tempArr.length-1] != '[]'){
             let tempArr2 = [];
             let tempArr3 = [];

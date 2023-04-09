@@ -51,8 +51,8 @@ export class ServerTile{
 }
 
 export class ServerTileEntity extends ServerTile{
-    constructor(type, name, hp, team, angle){
-        super(type, name, hp);
+    constructor(type, name, hp, team, angle, x, y, z){
+        super(type, name, hp, x, y, z);
         this.team = team;
         this.angle = angle; //an int for the angle which determines the direction the entity is facing
         this.offsets = "000";
