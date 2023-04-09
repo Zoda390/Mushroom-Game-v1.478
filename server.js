@@ -14,6 +14,7 @@ app.use(express.static("public"));
 console.log("My server is running on port " + port);
 
 
+var player_count = 0;
 var cur_file;
 var player_count = 0;
 
